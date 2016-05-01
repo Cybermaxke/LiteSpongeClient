@@ -1,0 +1,14 @@
+{
+    "required": true,
+    "minVersion": "0.5.3",
+    "package": "org.spongepowered.client.mixin",
+    "refmap": "mixins.litespongeclient.refmap.json",
+    "mixins": [
+        "client.gui.MixinGuiOverlayDebug",
+        "client.network.MixinNetworkManager",
+        "client.settings.MixinKeyBinding"
+    ],
+    "injectors": {
+        "defaultRequire": 1
+    }
+}

@@ -1,0 +1,96 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven {
+            name = 'sonatype'
+            url = 'https://oss.sonatype.org/content/repositories/snapshots/'
+        }
+        maven {
+            name = 'forge'
+            url = 'http://files.minecraftforge.net/maven'
+        }
+        maven {
+            name = 'sponge'
+            url = 'http://repo.spongepowered.org/maven'
+        }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT'
+        classpath 'org.spongepowered:mixingradle:0.4-SNAPSHOT'
+    }
+}
+
+plugins {
+    id 'com.github.hierynomus.license' version '0.12.0'
+}
+
+apply plugin: 'net.minecraftforge.gradle.liteloader'
+apply plugin: 'org.spongepowered.mixin'
+
+version = '1.0.0-SNAPSHOT'
+group = 'org.spongepowered'
+archivesBaseName = project.name.toLowerCase()
+
+// Minimum version of Java required
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+minecraft {
+    version = '1.9'
+    mappings = 'snapshot_20160410'
+    runDir = 'run'
+}
+
+sourceSets {
+    main {
+        // Refmap declaration must match the refmap name specified in the json config
+        refMap = 'mixins.' + archivesBaseName + '.refmap.json'
+    }
+}
+
+mixin {
+    defaultObfuscationEnv notch
+}
+
+litemod {
+    json {
+        name = project.archivesBaseName
+        displayName = project.displayName
+		version = project.version
+        description = project.description
+        author = project.organization
+        mcversion = minecraft.version
+        mixinConfigs += 'mixins.' + archivesBaseName + '.json'
+    }
+}
+
+jar {
+    from litemod.outputs
+}
+
+apply plugin: 'license'
+
+license {
+    header project.file('HEADER.txt')
+    sourceSets = project.sourceSets
+    include '**/*.java'
+
+    strictCheck true
+    ignoreFailures = false
+
+    ext {
+        name = project.name
+        organization = project.organization
+        url = project.url
+    }
+
+    mapping {
+        java = 'SLASHSTAR_STYLE'
+    }
+}
+
+// Gradle version used for generating the Gradle wrapper
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.12'
+}
