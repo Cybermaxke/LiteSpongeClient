@@ -75,7 +75,7 @@ public class MessageChannelHandler implements MessageDispatcher {
                 Message message;
                 try {
                     message = registration.get().getType().newInstance();
-                } catch (InstantiationException | IllegalAccessException e) {
+                } catch (Exception e) {
                     this.logger.error("Unable to instantiate the message type {}", registration.get().getType().getName(), e);
                     return;
                 }
@@ -112,7 +112,7 @@ public class MessageChannelHandler implements MessageDispatcher {
             buf.writeByte(registration.get().getOpcode());
             buf.writeBytes(content);
 
-            CPacketCustomPayload packet = new CPacketCustomPayload(this.channel, content);
+            CPacketCustomPayload packet = new CPacketCustomPayload(this.channel, buf);
             Minecraft.getMinecraft().thePlayer.sendQueue.addToSendQueue(packet);
         } else {
             this.logger.warn("Attempted to send a message type {} that wasn't registered", registration.get().getType().getName());

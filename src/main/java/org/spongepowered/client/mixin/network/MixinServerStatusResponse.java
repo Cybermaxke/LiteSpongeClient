@@ -22,34 +22,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.client.mixin.client.network;
+package org.spongepowered.client.mixin.network;
 
-import io.netty.channel.SimpleChannelInboundHandler;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.client.tracker.TrackerDataResponseHandler;
-import org.spongepowered.client.keyboard.KeyboardNetworkHandler;
-import net.minecraft.client.network.NetHandlerPlayClient;
-import net.minecraft.network.INetHandler;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.Packet;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.network.ServerStatusResponse;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.client.interfaces.IMixinServerStatusResponse;
 
-@Mixin(NetworkManager.class)
-public abstract class MixinNetworkManager extends SimpleChannelInboundHandler<Packet<?>> {
+@Mixin(ServerStatusResponse.class)
+public abstract class MixinServerStatusResponse implements IMixinServerStatusResponse {
 
-    @Shadow private INetHandler packetListener;
+    private boolean sponge;
+    private boolean modded;
 
-    @Inject(method = "closeChannel", at = @At("RETURN"))
-    public void onCloseChannel(ITextComponent message, CallbackInfo ci) {
-        if (this.packetListener instanceof NetHandlerPlayClient) {
-            // Cleanup the keyboard data at logout
-            KeyboardNetworkHandler.handleCleanup();
-            // Cleanup the tacker data
-            TrackerDataResponseHandler.handleCleanup();
-        }
+    @Override
+    public boolean isSponge() {
+        return this.sponge;
+    }
+
+    @Override
+    public void setSponge(boolean sponge) {
+        this.sponge = sponge;
+    }
+
+    @Override
+    public boolean isModded() {
+        return this.modded;
+    }
+
+    @Override
+    public void setModded(boolean modded) {
+        this.modded = modded;
     }
 }

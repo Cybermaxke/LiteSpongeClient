@@ -79,7 +79,7 @@ public class MessageRegistry {
      * @return The message registration
      */
     public <M extends Message> Optional<MessageRegistration<M>> getRegistration(Class<M> messageType) {
-        return Optional.ofNullable((MessageRegistration) this.registrationByType.get(checkNotNull(messageType, "messageType")));
+        return Optional.ofNullable((MessageRegistration<M>) this.registrationByType.get(checkNotNull(messageType, "messageType")));
     }
 
     /**
@@ -89,7 +89,7 @@ public class MessageRegistry {
      * @return The message registration
      */
     public Optional<MessageRegistration<?>> getRegistration(int opcode) {
-        return Optional.ofNullable((MessageRegistration) this.registrationByOpcode.lookup(opcode));
+        return Optional.ofNullable(this.registrationByOpcode.lookup(opcode));
     }
 
     /**
