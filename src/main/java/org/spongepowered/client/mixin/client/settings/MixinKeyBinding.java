@@ -25,10 +25,6 @@
 package org.spongepowered.client.mixin.client.settings;
 
 import com.mumfrey.liteloader.core.LiteLoader;
-import org.spongepowered.client.LiteModSpongeClient;
-import org.spongepowered.client.interfaces.IMixinKeyBinding;
-import org.spongepowered.client.keyboard.IClientKeyBinding;
-import org.spongepowered.client.network.types.MessageKeyState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.IntHashMap;
@@ -36,6 +32,10 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.client.LiteModSpongeClient;
+import org.spongepowered.client.interfaces.IMixinKeyBinding;
+import org.spongepowered.client.keyboard.IClientKeyBinding;
+import org.spongepowered.client.network.types.MessageKeyState;
 
 import java.util.List;
 import java.util.Set;

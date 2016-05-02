@@ -27,6 +27,11 @@ package org.spongepowered.client;
 import com.mumfrey.liteloader.LiteMod;
 import com.mumfrey.liteloader.PluginChannelListener;
 import com.mumfrey.liteloader.ShutdownListener;
+import com.mumfrey.liteloader.core.LiteLoader;
+import net.minecraft.client.network.ServerPinger;
+import net.minecraft.network.PacketBuffer;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.spongepowered.client.keyboard.KeyBindingStorage;
 import org.spongepowered.client.keyboard.KeyboardNetworkHandler;
 import org.spongepowered.client.network.MessageChannelHandler;
@@ -36,18 +41,14 @@ import org.spongepowered.client.network.types.MessageKeyboardData;
 import org.spongepowered.client.network.types.MessageTrackerDataRequest;
 import org.spongepowered.client.network.types.MessageTrackerDataResponse;
 import org.spongepowered.client.tracker.TrackerDataResponseHandler;
-import net.minecraft.network.PacketBuffer;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.Collections;
 import java.util.List;
 
 public class LiteModSpongeClient implements LiteMod, ShutdownListener, PluginChannelListener {
-
-    public static final String NAME = "LiteSpongeClient";
-    public static final String VERSION = "1.0.0";
 
     public static final String CHANNEL_NAME = "Sponge";
 
@@ -75,33 +76,62 @@ public class LiteModSpongeClient implements LiteMod, ShutdownListener, PluginCha
 
     @Override
     public String getVersion() {
-        return VERSION;
+        return SpongeClientInfo.VERSION;
     }
 
     @Override
     public void init(File configPath) {
+        if (!SpongeClientMixinPlugin.isLoaded()) {
+            return;
+        }
+        this.logger = LogManager.getLogger(SpongeClientInfo.NAME);
+
+        // Check whether we are running on the client
+        if (!LiteLoader.getGameEngine().isClient()) {
+            this.logger.warn("This mod may only be used on the client side, disabling...");
+            return;
+        }
+
         instance = this;
 
-        this.logger = LogManager.getLogger(LiteModSpongeClient.class);
-
+        // Register all the network messages
         MessageRegistry messageRegistry = new MessageRegistry();
         messageRegistry.register(0, MessageTrackerDataRequest.class);
         messageRegistry.register(1, MessageTrackerDataResponse.class, TrackerDataResponseHandler::handleTrackerResponse);
         messageRegistry.register(2, MessageKeyboardData.class, KeyboardNetworkHandler::handleKeyboardData);
         messageRegistry.register(3, MessageKeyState.class);
 
+        // Create a message handler and dispatcher
         this.channelHandler = new MessageChannelHandler(messageRegistry, CHANNEL_NAME, this.logger);
 
+        // Initialize the key binding storage
         this.keyBindingStorage = new KeyBindingStorage(new File("").toPath().resolve("sponge-key-bindings.txt"));
         try {
             this.keyBindingStorage.load();
         } catch (IOException e) {
             this.logger.error("An error occurred while loading the key bindings file", e);
         }
+
+        this.logger.info("Successfully initialized the {}", SpongeClientInfo.NAME);
+
+        /*
+        try {
+            Field[] fields = Class.forName(ServerPinger.class.getName() + "$1").getDeclaredFields();
+            for (int i = 0; i < fields.length; i++) {
+                System.out.println("Found ServerPinger$1 field: " + fields[i].getName() + " -> " + fields[i].getType());
+            }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        */
     }
 
     @Override
     public void onShutDown() {
+        if (!SpongeClientMixinPlugin.isLoaded()) {
+            return;
+        }
+
         try {
             this.keyBindingStorage.save();
         } catch (IOException e) {
@@ -115,7 +145,7 @@ public class LiteModSpongeClient implements LiteMod, ShutdownListener, PluginCha
 
     @Override
     public String getName() {
-        return NAME;
+        return SpongeClientInfo.NAME;
     }
 
     public Logger getLogger() {
@@ -132,11 +162,16 @@ public class LiteModSpongeClient implements LiteMod, ShutdownListener, PluginCha
 
     @Override
     public void onCustomPayload(String channel, PacketBuffer data) {
-        this.channelHandler.onCustomPayload(channel, data);
+        if (this.channelHandler != null) {
+            this.channelHandler.onCustomPayload(channel, data);
+        }
     }
 
     @Override
     public List<String> getChannels() {
-        return this.channelHandler.getChannels();
+        if (this.channelHandler != null) {
+            return this.channelHandler.getChannels();
+        }
+        return Collections.emptyList();
     }
 }

@@ -48,10 +48,7 @@ public class KeyboardNetworkHandler {
 
         // Inject the default internal ids
         GameSettings gameSettings = Minecraft.getMinecraft().gameSettings;
-        // TODO: Thread freezes here???
-        System.out.println("DEBUG: Before setInternalId");
         ((IMixinKeyBinding) gameSettings.keyBindAttack).setInternalId(0);
-        System.out.println("DEBUG: After setInternalId");
         ((IMixinKeyBinding) gameSettings.keyBindPickBlock).setInternalId(1);
         ((IMixinKeyBinding) gameSettings.keyBindUseItem).setInternalId(2);
         ((IMixinKeyBinding) gameSettings.keyBindDrop).setInternalId(3);

@@ -22,34 +22,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.client.mixin.client.network;
+package org.spongepowered.client.mixin.client.multiplayer;
 
-import io.netty.channel.SimpleChannelInboundHandler;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.client.tracker.TrackerDataResponseHandler;
-import org.spongepowered.client.keyboard.KeyboardNetworkHandler;
-import net.minecraft.client.network.NetHandlerPlayClient;
-import net.minecraft.network.INetHandler;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.Packet;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.client.multiplayer.ServerData;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.client.ServerType;
+import org.spongepowered.client.interfaces.IMixinServerData;
 
-@Mixin(NetworkManager.class)
-public abstract class MixinNetworkManager extends SimpleChannelInboundHandler<Packet<?>> {
+@Mixin(ServerData.class)
+public abstract class MixinServerData implements IMixinServerData {
 
-    @Shadow private INetHandler packetListener;
+    private ServerType serverType = ServerType.VANILLA;
 
-    @Inject(method = "closeChannel", at = @At("RETURN"))
-    public void onCloseChannel(ITextComponent message, CallbackInfo ci) {
-        if (this.packetListener instanceof NetHandlerPlayClient) {
-            // Cleanup the keyboard data at logout
-            KeyboardNetworkHandler.handleCleanup();
-            // Cleanup the tacker data
-            TrackerDataResponseHandler.handleCleanup();
-        }
+    @Override
+    public void setServerType(ServerType serverType) {
+        this.serverType = serverType;
+    }
+
+    @Override
+    public ServerType getServerType() {
+        return this.serverType;
     }
 }

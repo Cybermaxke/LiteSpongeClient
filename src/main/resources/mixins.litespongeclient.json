@@ -2,11 +2,17 @@
     "required": true,
     "minVersion": "0.5.3",
     "package": "org.spongepowered.client.mixin",
+    "plugin": "org.spongepowered.client.SpongeClientMixinPlugin",
     "refmap": "mixins.litespongeclient.refmap.json",
-    "mixins": [
+    "client": [
         "client.gui.MixinGuiOverlayDebug",
+        "client.gui.MixinServerListEntryNormal",
+        "client.multiplayer.MixinServerData",
         "client.network.MixinNetworkManager",
-        "client.settings.MixinKeyBinding"
+        "client.network.MixinServerPingerStatusHandler",
+        "client.settings.MixinKeyBinding",
+        "network.MixinServerStatusResponse",
+        "network.MixinServerStatusResponseSerializer"
     ],
     "injectors": {
         "defaultRequire": 1

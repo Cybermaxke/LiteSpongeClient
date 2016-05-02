@@ -73,7 +73,6 @@ public class KeyBindingStorage {
         if (Files.isDirectory(path)) {
             throw new IOException("Path must be a file!");
         }
-        Files.createDirectories(path.getParent());
 
         try (BufferedWriter writer = Files.newBufferedWriter(path)) {
             for (Map.Entry<String, Integer> entry : this.keyBindings.entrySet()) {
