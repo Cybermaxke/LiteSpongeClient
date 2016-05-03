@@ -6,6 +6,7 @@
     "refmap": "mixins.litespongeclient.refmap.json",
     "client": [
         "client.gui.MixinGuiIngame",
+        "client.gui.MixinGuiKeyBindingList",
         "client.gui.MixinGuiOverlayDebug",
         "client.gui.MixinServerListEntryNormal",
         "client.multiplayer.MixinServerData",
