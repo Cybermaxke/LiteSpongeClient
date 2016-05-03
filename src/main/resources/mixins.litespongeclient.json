@@ -5,6 +5,7 @@
     "plugin": "org.spongepowered.client.SpongeClientMixinPlugin",
     "refmap": "mixins.litespongeclient.refmap.json",
     "client": [
+        "client.gui.MixinGuiIngame",
         "client.gui.MixinGuiOverlayDebug",
         "client.gui.MixinServerListEntryNormal",
         "client.multiplayer.MixinServerData",

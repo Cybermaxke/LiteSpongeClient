@@ -24,7 +24,7 @@
  */
 package org.spongepowered.client.mixin.client.settings;
 
-import com.mumfrey.liteloader.core.LiteLoader;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.IntHashMap;
@@ -37,6 +37,7 @@ import org.spongepowered.client.interfaces.IMixinKeyBinding;
 import org.spongepowered.client.keyboard.IClientKeyBinding;
 import org.spongepowered.client.network.types.MessageKeyState;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -44,7 +45,7 @@ import java.util.stream.Collectors;
 @Mixin(KeyBinding.class)
 public abstract class MixinKeyBinding implements IMixinKeyBinding, Comparable<KeyBinding> {
 
-    // @Shadow private static List<KeyBinding> KEYBIND_ARRAY; // SpongeForge
+    @Final @Shadow private static List<KeyBinding> KEYBIND_ARRAY;
     @Final @Shadow private static IntHashMap<KeyBinding> HASH;
     @Shadow private boolean pressed;
     @Shadow private int pressTime;
@@ -75,26 +76,14 @@ public abstract class MixinKeyBinding implements IMixinKeyBinding, Comparable<Ke
         this.pressTime = time;
     }
 
-    /*
     @Override
     public void remove() { // SpongeForge
         KEYBIND_ARRAY.remove(this);
-    }
-    */
-
-    @Override
-    public String getCategory() {
-        return this.keyCategory;
     }
 
     @Override
     public String getFormattedCategory() {
         return I18n.format(this.keyCategory);
-    }
-
-    @Override
-    public String getDisplayName() {
-        return this.keyDescription;
     }
 
     @Override
@@ -114,10 +103,8 @@ public abstract class MixinKeyBinding implements IMixinKeyBinding, Comparable<Ke
      */
     @Overwrite
     public static Set<String> getKeybinds() {
-        // return KEYBIND_ARRAY.stream().map(keyBinding -> ((IMixinKeyBinding) keyBinding).getCategory()).collect(Collectors.toSet()); // SpongeForge
-        // LiteLoader
-        return LiteLoader.getGameEngine().getKeyBindings().stream()
-                .map(keyBinding -> ((IClientKeyBinding) keyBinding).getCategory())
+        return Arrays.asList(Minecraft.getMinecraft().gameSettings.keyBindings).stream()
+                .map(KeyBinding::getKeyCategory)
                 .collect(Collectors.toSet());
     }
 
@@ -146,9 +133,7 @@ public abstract class MixinKeyBinding implements IMixinKeyBinding, Comparable<Ke
      */
     @Overwrite
     public static void unPressAllKeys() {
-        // List<KeyBinding> keyBindings = KEYBIND_ARRAY; // SpongeForge
-        List<KeyBinding> keyBindings = LiteLoader.getGameEngine().getKeyBindings(); // LiteLoader
-        for (KeyBinding keyBinding : keyBindings) {
+        for (KeyBinding keyBinding : KEYBIND_ARRAY) {
             IMixinKeyBinding keyBinding0 = (IMixinKeyBinding) keyBinding;
             keyBinding0.setPressed(false);
             keyBinding0.setPressTime(0);

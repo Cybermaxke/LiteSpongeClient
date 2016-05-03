@@ -22,25 +22,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.client.tracker;
+package org.spongepowered.client.mixin.client.gui;
 
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiIngame;
+import net.minecraft.client.gui.GuiOverlayDebug;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.client.interfaces.IMixinGuiIngame;
-import org.spongepowered.client.interfaces.IMixinGuiOverlayDebug;
-import org.spongepowered.client.network.types.MessageTrackerDataResponse;
-import net.minecraft.client.Minecraft;
-import net.minecraft.network.play.INetHandlerPlayClient;
 
-public final class TrackerDataResponseHandler {
+@Mixin(GuiIngame.class)
+public abstract class MixinGuiIngame extends Gui implements IMixinGuiIngame {
 
-    public static void handleTrackerResponse(INetHandlerPlayClient handler, MessageTrackerDataResponse message) {
-        ((IMixinGuiOverlayDebug) ((IMixinGuiIngame) Minecraft.getMinecraft().ingameGUI).getOverlayDebugGui()).setTrackerData(
-                new TrackerData(message.getOwner(), message.getNotifier()));
-    }
+    @Final @Shadow private GuiOverlayDebug overlayDebug;
 
-    public static void handleCleanup() {
-        ((IMixinGuiOverlayDebug) ((IMixinGuiIngame) Minecraft.getMinecraft().ingameGUI).getOverlayDebugGui()).setTrackerData(null);
-    }
-
-    private TrackerDataResponseHandler() {
+    @Override
+    public GuiOverlayDebug getOverlayDebugGui() {
+        return this.overlayDebug;
     }
 }

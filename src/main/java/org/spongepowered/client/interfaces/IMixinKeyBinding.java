@@ -37,5 +37,5 @@ public interface IMixinKeyBinding extends IClientKeyBinding {
     /**
      * Removed this key binding from the internal array.
      */
-    // void remove(); // SpongeForge
+    void remove();
 }

@@ -62,23 +62,29 @@ public final class MessageKeyboardData implements Message {
     @Override
     public void readFrom(PacketBuffer buf) throws IOException {
         Map<Integer, KeyCategory> categories = new HashMap<>();
-        int keyCategoriesCount = buf.readVarIntFromBuffer();
+        int keyCategoriesCount = buf.readShort();
         for (int i = 0; i < keyCategoriesCount; i++) {
-            int internalId = buf.readVarIntFromBuffer();
+            int internalId = buf.readShort();
             String id = buf.readStringFromBuffer(256);
             ITextComponent title = buf.readTextComponent();
             categories.put(internalId, new KeyCategory(id, internalId, title));
         }
         this.keyCategories = new HashSet<>(categories.values());
-        int keyBindingCount = buf.readVarIntFromBuffer();
+        int keyBindingCount = buf.readShort();
         this.keyBindings = new HashSet<>(keyBindingCount);
         for (int i = 0; i < keyBindingCount; i++) {
-            int internalId = buf.readVarIntFromBuffer();
+            int internalId = buf.readShort();
             String id = buf.readStringFromBuffer(256);
-            int categoryId = buf.readVarIntFromBuffer();
+            int categoryId = buf.readShort();
             ITextComponent displayName = buf.readTextComponent();
 
-            KeyCategory keyCategory = checkNotNull(categories.get(categoryId));
+            KeyCategory keyCategory = categories.get(categoryId);
+            if (keyCategory == null) {
+                keyCategory = KeyCategory.DEFAULT_CATEGORIES.lookup(categoryId);
+                if (keyCategory == null) {
+                    throw new IllegalArgumentException("Received a key binding with a unknown category");
+                }
+            }
             this.keyBindings.add(new KeyBinding(id, internalId, keyCategory, displayName));
         }
     }

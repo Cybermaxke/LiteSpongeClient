@@ -22,16 +22,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.client.textures;
+package org.spongepowered.client.interfaces;
 
-import com.mumfrey.liteloader.client.gui.GuiLiteLoaderPanel;
+import net.minecraft.client.gui.GuiOverlayDebug;
 
-public final class GuiRenderHelper extends GuiLiteLoaderPanel {
+public interface IMixinGuiIngame {
 
-    /**
-     * Do not instantiate!
-     */
-    private GuiRenderHelper() {
-        super(null, null, null, null, null, null, false);
-    }
+    GuiOverlayDebug getOverlayDebugGui();
 }

@@ -24,12 +24,8 @@
  */
 package org.spongepowered.client.mixin.client.gui;
 
-import com.mumfrey.liteloader.core.LiteLoader;
-import org.spongepowered.client.LiteModSpongeClient;
-import org.spongepowered.client.interfaces.IMixinGuiOverlayDebug;
-import org.spongepowered.client.network.types.MessageTrackerDataRequest;
-import org.spongepowered.client.tracker.TrackerData;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiOverlayDebug;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
@@ -40,13 +36,17 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.client.LiteModSpongeClient;
+import org.spongepowered.client.interfaces.IMixinGuiOverlayDebug;
+import org.spongepowered.client.network.types.MessageTrackerDataRequest;
+import org.spongepowered.client.tracker.TrackerData;
 
 import java.util.List;
 
 import javax.annotation.Nullable;
 
 @Mixin(GuiOverlayDebug.class)
-public abstract class MixinGuiOverlayDebug implements IMixinGuiOverlayDebug {
+public abstract class MixinGuiOverlayDebug extends Gui implements IMixinGuiOverlayDebug {
 
     @Shadow @Final private Minecraft mc;
 
@@ -55,21 +55,19 @@ public abstract class MixinGuiOverlayDebug implements IMixinGuiOverlayDebug {
 
     @Inject(method = "call()Ljava/util/List;", at = @At(value = "RETURN", ordinal = 1))
     public void addOwnerInfo(CallbackInfoReturnable<List<String>> cir) {
-        if (this.trackerData == null) {
-            if (!LiteLoader.getServerPluginChannels().isRemoteChannelRegistered(LiteModSpongeClient.CHANNEL_NAME)) {
-                return;
-            }
-            this.trackerData = new TrackerData(null, null);
-        }
         List<String> list = cir.getReturnValue();
         if (this.mc.objectMouseOver != null
                 && this.mc.objectMouseOver.typeOfHit == RayTraceResult.Type.BLOCK
                 && this.mc.objectMouseOver.getBlockPos() != null) {
             BlockPos blockPos = this.mc.objectMouseOver.getBlockPos();
-            LiteModSpongeClient.getInstance().getChannelHandler().sendToServer(
-                    new MessageTrackerDataRequest(0, -1, blockPos.getX(), blockPos.getY(), blockPos.getZ()));
-            list.add("Block Owner: " + orUnknown(this.trackerData.getOwner()));
-            list.add("Block Notifier: " + orUnknown(this.trackerData.getNotifier()));
+            if (!blockPos.equals(this.cursorPos)) {
+                LiteModSpongeClient.getInstance().getChannelHandler().sendToServer(
+                        new MessageTrackerDataRequest(0, -1, blockPos.getX(), blockPos.getY(), blockPos.getZ()));
+            }
+            if (this.trackerData != null) {
+                list.add("Block Owner: " + orUnknown(this.trackerData.getOwner()));
+                list.add("Block Notifier: " + orUnknown(this.trackerData.getNotifier()));
+            }
             this.cursorPos = this.mc.objectMouseOver.getBlockPos();
         } else if (this.mc.objectMouseOver != null && this.mc.objectMouseOver.typeOfHit == RayTraceResult.Type.ENTITY) {
             Entity target = this.mc.objectMouseOver.entityHit;
@@ -78,8 +76,10 @@ public abstract class MixinGuiOverlayDebug implements IMixinGuiOverlayDebug {
                 LiteModSpongeClient.getInstance().getChannelHandler().sendToServer(
                         new MessageTrackerDataRequest(1, target.getEntityId(), blockPos.getX(), blockPos.getY(), blockPos.getZ()));
             }
-            list.add("Entity Owner: " + orUnknown(this.trackerData.getOwner()));
-            list.add("Entity Notifier: " + orUnknown(this.trackerData.getNotifier()));
+            if (this.trackerData != null) {
+                list.add("Entity Owner: " + orUnknown(this.trackerData.getOwner()));
+                list.add("Entity Notifier: " + orUnknown(this.trackerData.getNotifier()));
+            }
             this.cursorPos = blockPos;
         }
     }
