@@ -24,7 +24,6 @@
  */
 package org.spongepowered.client.keyboard;
 
-import com.mumfrey.liteloader.core.LiteLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.network.play.INetHandlerPlayClient;
@@ -34,6 +33,7 @@ import org.spongepowered.client.network.types.MessageKeyboardData;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -77,15 +77,14 @@ public class KeyboardNetworkHandler {
         KeyBindingStorage storage = LiteModSpongeClient.getInstance().getKeyBindingStorage();
 
         // Build all the custom key bindings
-        // List<net.minecraft.client.settings.KeyBinding> keyBindings = new ArrayList<>(Arrays.asList(gameSettings.keyBindings)); // SpongeForge
+        List<net.minecraft.client.settings.KeyBinding> keyBindings = new ArrayList<>(Arrays.asList(gameSettings.keyBindings));
         for (KeyBinding keyBinding : message.getKeyBindings()) {
             CustomClientKeyBinding clientKeyBinding = new CustomClientKeyBinding(keyBinding);
-            storage.getKeyCode(keyBinding.getId().toLowerCase()).ifPresent(clientKeyBinding::setKeyCode);
-            // keyBindings.add(clientKeyBinding);
-            LiteLoader.getInput().registerKeyBinding(clientKeyBinding);
+            storage.getKeyCode(keyBinding.getId().toLowerCase()).ifPresent(clientKeyBinding::setKeyCodeWithoutSave);
+            keyBindings.add(clientKeyBinding);
         }
         // Update the key bindings array in the settings menu
-        // gameSettings.keyBindings = keyBindings.toArray(new net.minecraft.client.settings.KeyBinding[keyBindings.size()]); // SpongeForge
+        gameSettings.keyBindings = keyBindings.toArray(new net.minecraft.client.settings.KeyBinding[keyBindings.size()]);
         initialized = true;
     }
 
@@ -93,19 +92,17 @@ public class KeyboardNetworkHandler {
         if (!initialized) {
             return;
         }
-        // GameSettings gameSettings = Minecraft.getMinecraft().gameSettings; // SpongeForge
-        // List<net.minecraft.client.settings.KeyBinding> keyBindings = new ArrayList<>(Arrays.asList(gameSettings.keyBindings)); // SpongeForge
-        List<net.minecraft.client.settings.KeyBinding> keyBindings = new ArrayList<>(LiteLoader.getGameEngine().getKeyBindings()); // Liteloader
+        GameSettings gameSettings = Minecraft.getMinecraft().gameSettings;
+        List<net.minecraft.client.settings.KeyBinding> keyBindings = new ArrayList<>(Arrays.asList(gameSettings.keyBindings));
         Iterator<net.minecraft.client.settings.KeyBinding> it = keyBindings.iterator();
         // Get the key binding storage
         KeyBindingStorage storage = LiteModSpongeClient.getInstance().getKeyBindingStorage();
         while (it.hasNext()) {
             net.minecraft.client.settings.KeyBinding keyBinding = it.next();
             if (keyBinding instanceof CustomClientKeyBinding) {
-                // ((IMixinKeyBinding) keyBinding).remove(); // SpongeForge
+                ((IMixinKeyBinding) keyBinding).remove();
                 storage.putKeyCode(((CustomClientKeyBinding) keyBinding).getId(), keyBinding.getKeyCode());
-                // it.remove(); // SpongeForge
-                LiteLoader.getInput().unRegisterKeyBinding(keyBinding); // Liteloader
+                it.remove();
             } else {
                 ((IMixinKeyBinding) keyBinding).setInternalId(-1);
             }
@@ -116,9 +113,9 @@ public class KeyboardNetworkHandler {
             LiteModSpongeClient.getInstance().getLogger().error("An error occurred while saving the key bindings file", e);
         }
         // Update the key bindings array in the settings menu
-        // gameSettings.keyBindings = keyBindings.toArray(new net.minecraft.client.settings.KeyBinding[keyBindings.size()]); // SpongeForge
+        gameSettings.keyBindings = keyBindings.toArray(new net.minecraft.client.settings.KeyBinding[keyBindings.size()]);
         // Reprocess the key bindings mappings after removal
-        // net.minecraft.client.settings.KeyBinding.resetKeyBindingArrayAndHash(); // SpongeForge
+        net.minecraft.client.settings.KeyBinding.resetKeyBindingArrayAndHash();
         initialized = false;
     }
 }

@@ -76,7 +76,7 @@ public class KeyBindingStorage {
 
         try (BufferedWriter writer = Files.newBufferedWriter(path)) {
             for (Map.Entry<String, Integer> entry : this.keyBindings.entrySet()) {
-                writer.write(entry.getKey() + '=' + entry.getValue());
+                writer.write(entry.getKey() + '=' + entry.getValue() + '\n');
             }
         }
     }
@@ -100,6 +100,9 @@ public class KeyBindingStorage {
             while (it.hasNext()) {
                 lineIndex++;
                 String line = it.next();
+                if (line.isEmpty()) {
+                    continue;
+                }
 
                 int index = line.lastIndexOf('=');
                 if (index == -1) {

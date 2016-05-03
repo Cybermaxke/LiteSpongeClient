@@ -24,15 +24,22 @@
  */
 package org.spongepowered.client.keyboard;
 
-import org.spongepowered.client.interfaces.IMixinKeyBinding;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.util.text.ITextComponent;
+import org.spongepowered.client.LiteModSpongeClient;
+import org.spongepowered.client.interfaces.IMixinKeyBinding;
+
+import java.io.IOException;
+
+import javax.annotation.Nullable;
 
 public class CustomClientKeyBinding extends net.minecraft.client.settings.KeyBinding implements IClientKeyBinding {
 
     private final String id;
 
     private ITextComponent displayName;
-    private ITextComponent categoryTitle;
+    @Nullable private ITextComponent categoryTitle;
+    @Nullable private String categoryTranslationKey;
 
     /**
      * Creates a new custom key binding for the
@@ -41,11 +48,32 @@ public class CustomClientKeyBinding extends net.minecraft.client.settings.KeyBin
      * @param keyBinding The key binding
      */
     public CustomClientKeyBinding(KeyBinding keyBinding) {
-        super(keyBinding.getDisplayName().getUnformattedText(), 0, keyBinding.getKeyCategory().getTitle().getUnformattedText());
+        super(keyBinding.getDisplayName().getUnformattedText(), 0, keyBinding.getKeyCategory().getTitle()
+                .map(ITextComponent::getUnformattedText).orElseGet(() -> keyBinding.getKeyCategory().getTranslatableTitle().get()));
         ((IMixinKeyBinding) this).setInternalId(keyBinding.getInternalId());
         this.id = keyBinding.getId();
         this.displayName = keyBinding.getDisplayName();
-        this.categoryTitle = keyBinding.getKeyCategory().getTitle();
+        this.categoryTitle = keyBinding.getKeyCategory().getTitle().orElse(null);
+        this.categoryTranslationKey = keyBinding.getKeyCategory().getTranslatableTitle().orElse(null);
+    }
+
+    public void setKeyCodeWithoutSave(int keyCode) {
+        super.setKeyCode(keyCode);
+    }
+
+    @Override
+    public void setKeyCode(int keyCode) {
+        int oldKeyCode = this.getKeyCode();
+        super.setKeyCode(keyCode);
+        if (oldKeyCode != keyCode) {
+            KeyBindingStorage storage = LiteModSpongeClient.getInstance().getKeyBindingStorage();
+            storage.putKeyCode(this.id, keyCode);
+            try {
+                storage.save();
+            } catch (IOException e) {
+                LiteModSpongeClient.getInstance().getLogger().error("An error occurred while loading the key bindings file", e);
+            }
+        }
     }
 
     /**
@@ -68,18 +96,19 @@ public class CustomClientKeyBinding extends net.minecraft.client.settings.KeyBin
     }
 
     @Override
-    public String getCategory() {
-        return this.categoryTitle.getUnformattedText();
+    public String getKeyCategory() {
+        if (this.categoryTitle != null) {
+            return this.categoryTitle.getUnformattedText();
+        }
+        return this.categoryTranslationKey;
     }
 
     @Override
     public String getFormattedCategory() {
-        return this.categoryTitle.getUnformattedText();
-    }
-
-    @Override
-    public String getDisplayName() {
-        return this.displayName.getUnformattedText();
+        if (this.categoryTitle != null) {
+            return this.categoryTitle.getUnformattedText();
+        }
+        return I18n.format(this.categoryTranslationKey);
     }
 
     @Override

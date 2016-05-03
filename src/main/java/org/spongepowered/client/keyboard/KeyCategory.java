@@ -24,15 +24,40 @@
  */
 package org.spongepowered.client.keyboard;
 
+import net.minecraft.util.IntHashMap;
 import net.minecraft.util.text.ITextComponent;
+
+import java.util.Optional;
+
+import javax.annotation.Nullable;
 
 public final class KeyCategory {
 
+    public static final IntHashMap<KeyCategory> DEFAULT_CATEGORIES = new IntHashMap<>();
+
+    static {
+        DEFAULT_CATEGORIES.addKey(0, new KeyCategory("minecraft:movement", 0, "key.categories.movement"));
+        DEFAULT_CATEGORIES.addKey(1, new KeyCategory("minecraft:inventory", 1, "key.categories.inventory"));
+        DEFAULT_CATEGORIES.addKey(2, new KeyCategory("minecraft:gameplay", 2, "key.categories.gameplay"));
+        DEFAULT_CATEGORIES.addKey(3, new KeyCategory("minecraft:multiplayer", 3, "key.categories.multiplayer"));
+        DEFAULT_CATEGORIES.addKey(4, new KeyCategory("minecraft:misc", 4, "key.categories.misc"));
+    }
+
     private final String id;
     private final int internalId;
-    private final ITextComponent title;
+    @Nullable private final ITextComponent title;
+    @Nullable private final String translationKey;
 
     public KeyCategory(String id, int internalId, ITextComponent title) {
+        this(id, internalId, title, null);
+    }
+
+    private KeyCategory(String id, int internalId, String translationKey) {
+        this(id, internalId, null, translationKey);
+    }
+
+    private KeyCategory(String id, int internalId, @Nullable ITextComponent title, @Nullable String translationKey) {
+        this.translationKey = translationKey;
         this.internalId = internalId;
         this.title = title;
         this.id = id;
@@ -46,7 +71,11 @@ public final class KeyCategory {
         return this.internalId;
     }
 
-    public ITextComponent getTitle() {
-        return this.title;
+    public Optional<ITextComponent> getTitle() {
+        return Optional.ofNullable(this.title);
+    }
+
+    public Optional<String> getTranslatableTitle() {
+        return Optional.ofNullable(this.translationKey);
     }
 }

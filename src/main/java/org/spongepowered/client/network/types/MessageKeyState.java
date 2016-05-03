@@ -41,7 +41,7 @@ public final class MessageKeyState implements Message {
 
     @Override
     public void writeTo(PacketBuffer buf) throws IOException {
-        buf.writeVarIntToBuffer(this.keyBindingId);
+        buf.writeShort(this.keyBindingId);
         buf.writeBoolean(this.state);
     }
 
