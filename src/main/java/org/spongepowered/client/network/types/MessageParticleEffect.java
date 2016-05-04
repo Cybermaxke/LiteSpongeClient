@@ -24,24 +24,22 @@
  */
 package org.spongepowered.client.network.types;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.client.network.Message;
 import org.spongepowered.client.particle.ParticleOption;
+import org.spongepowered.client.particle.ParticleOptions;
 
-import java.awt.Color;
 import java.io.IOException;
-import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public final class MessageParticleEffect implements Message {
 
     private int particleType;
     private Vec3d position;
-    private Map<ParticleOption, Object> options;
+    private Map<ParticleOption<?>, Object> options;
 
     public MessageParticleEffect() {
     }
@@ -51,9 +49,10 @@ public final class MessageParticleEffect implements Message {
         throw new UnsupportedOperationException();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void readFrom(PacketBuffer buf) throws IOException {
-        this.options = new EnumMap<>(ParticleOption.class);
+        this.options = new HashMap<>();
         this.particleType = buf.readShort();
 
         double x = buf.readFloat();
@@ -65,15 +64,15 @@ public final class MessageParticleEffect implements Message {
          * Keep reading options as long as they are coming, and stop
          * when the client doesn't have any more options that can be used.
          */
-        int maxOptions = ParticleOption.getOptionsCount();
+        int maxOptions = ParticleOptions.getOptionsCount();
         int startIndex = 0;
         while (startIndex < maxOptions && buf.readableBytes() > 0) {
             byte options = buf.readByte();
             for (int i = 0; i < Byte.SIZE; i++) {
                 if ((options & (1 << i)) != 0) {
-                    ParticleOption option = ParticleOption.getOption(startIndex + i);
+                    ParticleOption option = ParticleOptions.getOption(startIndex + i);
                     if (option != null) {
-                        this.options.put(option, readValue(option, buf));
+                        this.options.put(option, option.getDeserializer().apply(buf));
                     }
                 }
             }
@@ -81,35 +80,13 @@ public final class MessageParticleEffect implements Message {
         }
     }
 
-    private static Object readValue(ParticleOption option, PacketBuffer buf) {
-        switch (option) {
-            case COUNT:
-                return buf.readInt();
-            case OFFSET:
-            case VELOCITY:
-                double x = buf.readFloat();
-                double y = buf.readFloat();
-                double z = buf.readFloat();
-                return new Vec3d(x, y, z);
-            case COLOR:
-                return new Color(buf.readInt());
-            case SCALE:
-                return buf.readFloat();
-            case ITEM:
-                int itemType = buf.readVarIntFromBuffer();
-                short damage = buf.readShort();
-                return new ItemStack(Item.getItemById(itemType), 1, damage);
-            case BLOCK:
-                return Block.getStateById(buf.readVarIntFromBuffer());
-            case NOTE:
-                return buf.readByte();
-            default:
-                throw new UnsupportedOperationException("Unsupported particle option: " + option.toString());
-        }
+    public Map<ParticleOption<?>, Object> getOptions() {
+        return this.options;
     }
 
-    public Map<ParticleOption, Object> getOptions() {
-        return this.options;
+    @SuppressWarnings("unchecked")
+    public <V> Optional<V> getOption(ParticleOption<V> option) {
+        return (Optional) Optional.ofNullable(this.options.get(option));
     }
 
     public Vec3d getPosition() {

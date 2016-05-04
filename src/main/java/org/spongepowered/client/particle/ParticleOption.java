@@ -24,51 +24,25 @@
  */
 package org.spongepowered.client.particle;
 
-import net.minecraft.util.IntHashMap;
+import net.minecraft.network.PacketBuffer;
 
-import javax.annotation.Nullable;
+import java.util.function.Function;
 
-/**
- * An enumeration with all the particle options in minecraft.
- */
-public enum ParticleOption {
-    COUNT,
-    OFFSET,
-    VELOCITY,
-    COLOR,
-    SCALE,
-    /**
-     * The displayed item represented as a item type
-     * and a damage value.
-     */
-    ITEM,
-    /**
-     * The displayed block state.
-     */
-    BLOCK,
-    NOTE,
-    ;
+public final class ParticleOption<V> {
 
-    private final static IntHashMap<ParticleOption> lookup = new IntHashMap<>();
-    private final static int count = ParticleOption.values().length;
+    private final Class<V> valueType;
+    private final Function<PacketBuffer, V> deserializer;
 
-    public static int getOptionsCount() {
-        return count;
+    public ParticleOption(Class<V> valueType, Function<PacketBuffer, V> deserializer) {
+        this.deserializer = deserializer;
+        this.valueType = valueType;
     }
 
-    /**
-     * Gets a {@link ParticleOption} for the specified id.
-     *
-     * @return The particle option
-     */
-    @Nullable
-    public static ParticleOption getOption(int id) {
-        return lookup.lookup(id);
+    public Class<V> getValueType() {
+        return this.valueType;
     }
 
-    static {
-        for (ParticleOption option : values()) {
-            lookup.addKey(option.ordinal(), option);
-        }
+    public Function<PacketBuffer, V> getDeserializer() {
+        return this.deserializer;
     }
 }

@@ -38,8 +38,10 @@ import org.spongepowered.client.network.MessageChannelHandler;
 import org.spongepowered.client.network.MessageRegistry;
 import org.spongepowered.client.network.types.MessageKeyState;
 import org.spongepowered.client.network.types.MessageKeyboardData;
+import org.spongepowered.client.network.types.MessageParticleEffect;
 import org.spongepowered.client.network.types.MessageTrackerDataRequest;
 import org.spongepowered.client.network.types.MessageTrackerDataResponse;
+import org.spongepowered.client.particle.ParticleEffectNetworkHandler;
 import org.spongepowered.client.tracker.TrackerDataResponseHandler;
 
 import java.io.File;
@@ -100,6 +102,7 @@ public class LiteModSpongeClient implements LiteMod, ShutdownListener, PluginCha
         messageRegistry.register(1, MessageTrackerDataResponse.class, TrackerDataResponseHandler::handleTrackerResponse);
         messageRegistry.register(2, MessageKeyboardData.class, KeyboardNetworkHandler::handleKeyboardData);
         messageRegistry.register(3, MessageKeyState.class);
+        messageRegistry.register(4, MessageParticleEffect.class, ParticleEffectNetworkHandler::handleParticleEffect);
 
         // Create a message handler and dispatcher
         this.channelHandler = new MessageChannelHandler(messageRegistry, CHANNEL_NAME, this.logger);
