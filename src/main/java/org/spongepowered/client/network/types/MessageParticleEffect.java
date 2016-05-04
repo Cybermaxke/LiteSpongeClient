@@ -61,14 +61,23 @@ public final class MessageParticleEffect implements Message {
         double z = buf.readFloat();
         this.position = new Vec3d(x, y, z);
 
-        byte options = buf.readByte();
-        for (int i = 0; i < Byte.SIZE; i++) {
-            if ((options & (1 << i)) != 0) {
-                ParticleOption option = ParticleOption.getOption(i);
-                if (option != null) {
-                    this.options.put(option, readValue(option, buf));
+        /**
+         * Keep reading options as long as they are coming, and stop
+         * when the client doesn't have any more options that can be used.
+         */
+        int maxOptions = ParticleOption.getOptionsCount();
+        int startIndex = 0;
+        while (startIndex < maxOptions && buf.readableBytes() > 0) {
+            byte options = buf.readByte();
+            for (int i = 0; i < Byte.SIZE; i++) {
+                if ((options & (1 << i)) != 0) {
+                    ParticleOption option = ParticleOption.getOption(startIndex + i);
+                    if (option != null) {
+                        this.options.put(option, readValue(option, buf));
+                    }
                 }
             }
+            startIndex += Byte.SIZE;
         }
     }
 

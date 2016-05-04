@@ -50,6 +50,11 @@ public enum ParticleOption {
     ;
 
     private final static IntHashMap<ParticleOption> lookup = new IntHashMap<>();
+    private final static int count = ParticleOption.values().length;
+
+    public static int getOptionsCount() {
+        return count;
+    }
 
     /**
      * Gets a {@link ParticleOption} for the specified id.
