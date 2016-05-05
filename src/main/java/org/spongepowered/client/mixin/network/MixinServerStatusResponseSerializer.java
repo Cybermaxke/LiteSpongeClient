@@ -46,22 +46,16 @@ public abstract class MixinServerStatusResponseSerializer {
     @Inject(method = "deserialize", at = @At("RETURN"))
     private void onDeserialize(JsonElement element, Type type, JsonDeserializationContext ctx, CallbackInfoReturnable<ServerStatusResponse> cir) {
         JsonObject json = element.getAsJsonObject();
-        JsonObject modInfo = json.has("modinfo") ? json.getAsJsonObject("modinfo") : null;
-
         ServerStatusResponse response = cir.getReturnValue();
-        List<String> mods = null;
-
-        if (modInfo != null && modInfo.has("modList")) {
-            mods = StreamSupport.stream(json.getAsJsonArray("modList").spliterator(), false)
-                    .map(e -> e.getAsJsonObject().get("modid").getAsString())
-                    .collect(Collectors.toList());
-        }
 
         ServerType serverType = json.has("spongeServerType") ? ServerType.valueOf(json.get("spongeServerType").getAsString().toUpperCase()) : null;
         if (serverType == null) {
-            if (mods != null) {
-                boolean sponge = mods.contains("SpongeForge");
-                if (sponge) {
+            JsonObject modInfo = json.has("modinfo") ? json.getAsJsonObject("modinfo") : null;
+            if (modInfo != null && modInfo.has("modList")) {
+                List<String> mods = StreamSupport.stream(modInfo.getAsJsonArray("modList").spliterator(), false)
+                        .map(e -> e.getAsJsonObject().get("modid").getAsString())
+                        .collect(Collectors.toList());
+                if (mods.contains("sponge")) {
                     serverType = ServerType.SPONGE_FORGE;
                 } else {
                     serverType = ServerType.FORGE;
