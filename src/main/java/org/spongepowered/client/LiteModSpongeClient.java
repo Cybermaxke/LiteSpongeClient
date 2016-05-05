@@ -28,7 +28,6 @@ import com.mumfrey.liteloader.LiteMod;
 import com.mumfrey.liteloader.PluginChannelListener;
 import com.mumfrey.liteloader.ShutdownListener;
 import com.mumfrey.liteloader.core.LiteLoader;
-import net.minecraft.client.network.ServerPinger;
 import net.minecraft.network.PacketBuffer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -44,7 +43,6 @@ import org.spongepowered.client.tracker.TrackerDataResponseHandler;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.List;
 
@@ -81,9 +79,6 @@ public class LiteModSpongeClient implements LiteMod, ShutdownListener, PluginCha
 
     @Override
     public void init(File configPath) {
-        if (!SpongeClientMixinPlugin.isLoaded()) {
-            return;
-        }
         this.logger = LogManager.getLogger(SpongeClientInfo.NAME);
 
         // Check whether we are running on the client
@@ -128,10 +123,6 @@ public class LiteModSpongeClient implements LiteMod, ShutdownListener, PluginCha
 
     @Override
     public void onShutDown() {
-        if (!SpongeClientMixinPlugin.isLoaded()) {
-            return;
-        }
-
         try {
             this.keyBindingStorage.save();
         } catch (IOException e) {

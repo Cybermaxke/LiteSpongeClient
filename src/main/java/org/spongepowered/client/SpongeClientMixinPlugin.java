@@ -24,7 +24,6 @@
  */
 package org.spongepowered.client;
 
-import org.apache.logging.log4j.LogManager;
 import org.spongepowered.asm.lib.tree.ClassNode;
 import org.spongepowered.asm.mixin.MixinEnvironment;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
@@ -35,30 +34,9 @@ import java.util.Set;
 
 public class SpongeClientMixinPlugin implements IMixinConfigPlugin {
 
-    private static boolean loaded = false;
-
-    /**
-     * Gets whether the {@link SpongeClientMixinPlugin} was able to load.
-     *
-     * @return Is loaded
-     */
-    public static boolean isLoaded() {
-        return loaded;
-    }
-
     @Override
     public void onLoad(String mixinPackage) {
-        try {
-            MixinEnvironment.setCompatibilityLevel(MixinEnvironment.CompatibilityLevel.JAVA_8);
-            // We successfully loaded our required environment
-            loaded = true;
-            // Debug message
-            LogManager.getLogger(SpongeClientInfo.NAME).info("Successfully loaded the sponge client mixin environment.");
-        } catch (IllegalArgumentException e) {
-            // setCompatibilityLevel threw an exception, this means that java 8 isn't supported
-            LogManager.getLogger(SpongeClientInfo.NAME).warn("Unable to load the sponge client transformer, "
-                    + "java 8 is required", e);
-        }
+        MixinEnvironment.setCompatibilityLevel(MixinEnvironment.CompatibilityLevel.JAVA_8);
     }
 
     @Override
