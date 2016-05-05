@@ -24,11 +24,11 @@
  */
 package org.spongepowered.client.interfaces;
 
-import org.spongepowered.client.ServerType;
+import org.spongepowered.client.SpongeStatusInfo;
 
 public interface IMixinServerData {
 
-    void setServerType(ServerType serverType);
+    void setSpongeInfo(SpongeStatusInfo statusInfo);
 
-    ServerType getServerType();
+    SpongeStatusInfo getSpongeInfo();
 }

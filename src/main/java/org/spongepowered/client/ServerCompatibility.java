@@ -22,13 +22,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.client.interfaces;
+package org.spongepowered.client;
 
-import org.spongepowered.client.SpongeStatusInfo;
-
-public interface IMixinServerStatusResponse {
-
-    void setSpongeInfo(SpongeStatusInfo statusInfo);
-
-    SpongeStatusInfo getSpongeInfo();
+/**
+ * Represents the compatibility between the client and a server.
+ */
+public enum ServerCompatibility {
+    /**
+     * Joining the server will never result into issues, and
+     * you will most likely be able to join.
+     */
+    SUCCESS,
+    /**
+     * You will not be able to join the server.
+     */
+    FAIL,
+    /**
+     * There isn't enough info about the server that we have to
+     * know if there will be issues, the server will have to handle
+     * the issues at login. (Like forge handshake)
+     */
+    UNKNOWN,
 }

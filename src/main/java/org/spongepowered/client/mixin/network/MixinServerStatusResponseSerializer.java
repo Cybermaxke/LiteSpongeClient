@@ -32,7 +32,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.client.ServerCompatibility;
 import org.spongepowered.client.ServerType;
+import org.spongepowered.client.SpongeStatusInfo;
 import org.spongepowered.client.interfaces.IMixinServerStatusResponse;
 
 import java.lang.reflect.Type;
@@ -48,22 +50,39 @@ public abstract class MixinServerStatusResponseSerializer {
         JsonObject json = element.getAsJsonObject();
         ServerStatusResponse response = cir.getReturnValue();
 
-        ServerType serverType = json.has("spongeServerType") ? ServerType.valueOf(json.get("spongeServerType").getAsString().toUpperCase()) : null;
-        if (serverType == null) {
+        ServerType serverType = null;
+        ServerCompatibility serverCompat = null;
+
+        if (json.has("spongeInfo")) {
+            JsonObject spongeInfo = json.getAsJsonObject("spongeInfo");
+            serverType = spongeInfo.has("serverType") ? ServerType.valueOf(spongeInfo.get("serverType").getAsString().toUpperCase()) : null;
+            // Mainly means the server compatibility against the vanilla client
+            serverCompat = spongeInfo.has("serverCompat") ? ServerCompatibility.valueOf(
+                    spongeInfo.get("serverCompat").getAsString().toUpperCase()) : null;
+        }
+
+        // System.out.println(new GsonBuilder().setPrettyPrinting().create().toJson(json.getAsJsonObject("modinfo")));
+
+        if (serverType == null || serverCompat == null) {
             JsonObject modInfo = json.has("modinfo") ? json.getAsJsonObject("modinfo") : null;
             if (modInfo != null && modInfo.has("modList")) {
                 List<String> mods = StreamSupport.stream(modInfo.getAsJsonArray("modList").spliterator(), false)
                         .map(e -> e.getAsJsonObject().get("modid").getAsString())
                         .collect(Collectors.toList());
-                if (mods.contains("sponge")) {
-                    serverType = ServerType.SPONGE_FORGE;
-                } else {
-                    serverType = ServerType.FORGE;
+                if (serverType == null) {
+                    if (mods.contains("sponge")) {
+                        serverType = ServerType.SPONGE_FORGE;
+                    } else {
+                        serverType = ServerType.FORGE;
+                    }
+                }
+            } else {
+                if (serverCompat == null) {
+                    serverCompat = ServerCompatibility.UNKNOWN;
                 }
             }
         }
-        if (serverType != null) {
-            ((IMixinServerStatusResponse) response).setServerType(serverType);
-        }
+        ((IMixinServerStatusResponse) response).setSpongeInfo(new SpongeStatusInfo(
+                serverType == null ? ServerType.VANILLA : serverType, serverCompat == null ? ServerCompatibility.UNKNOWN : serverCompat));
     }
 }

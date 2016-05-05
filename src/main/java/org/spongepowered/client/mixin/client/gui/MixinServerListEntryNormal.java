@@ -36,7 +36,9 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.client.ServerCompatibility;
 import org.spongepowered.client.ServerType;
+import org.spongepowered.client.SpongeStatusInfo;
 import org.spongepowered.client.gui.GuiIcons;
 import org.spongepowered.client.gui.TooltipIcon;
 import org.spongepowered.client.interfaces.IMixinServerData;
@@ -55,7 +57,8 @@ public abstract class MixinServerListEntryNormal implements GuiListExtended.IGui
         int ry = mouseY - y;
 
         TooltipIcon[] icons = null;
-        ServerType serverType = ((IMixinServerData) this.server).getServerType();
+        SpongeStatusInfo statusInfo = ((IMixinServerData) this.server).getSpongeInfo();
+        ServerType serverType = statusInfo.getServerType();
 
         if (serverType != ServerType.VANILLA) {
             icons = new TooltipIcon[serverType == ServerType.SPONGE_FORGE ? 2 : 1];
@@ -64,7 +67,14 @@ public abstract class MixinServerListEntryNormal implements GuiListExtended.IGui
                 icons[index++] = new TooltipIcon(GuiIcons.SPONGE_ICON, "Sponge Server");
             }
             if (serverType == ServerType.SPONGE_FORGE || serverType == ServerType.FORGE) {
-                icons[index] = new TooltipIcon(GuiIcons.FORGE_ICON, "Forge Server");
+                ServerCompatibility compat = statusInfo.getCompatibility();
+                if (compat == ServerCompatibility.SUCCESS) {
+                    icons[index] = new TooltipIcon(GuiIcons.FORGE_SUCCESS_ICON, "Forge Server");
+                } else if (compat == ServerCompatibility.FAIL) {
+                    icons[index] = new TooltipIcon(GuiIcons.FORGE_FAIL_ICON, "Forge Server\n? Incompatible");
+                } else {
+                    icons[index] = new TooltipIcon(GuiIcons.FORGE_UNKNOWN_ICON, "Forge Server\n\u27A1 Unknown compatibility");
+                }
             }
         }
 

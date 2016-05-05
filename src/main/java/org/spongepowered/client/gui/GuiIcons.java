@@ -31,5 +31,7 @@ public final class GuiIcons {
 
     public final static ResourceLocation RESOURCE = new ResourceLocation("litespongeclient:textures/gui/icons.png");
     public final static IconAbsolute SPONGE_ICON = new IconAbsolute(RESOURCE, "sponge", 16, 16, 0f, 0f, 64f, 64f);
-    public final static IconAbsolute FORGE_ICON = new IconAbsolute(RESOURCE, "forge", 16, 16, 64f, 0f, 128f, 64f);
+    public final static IconAbsolute FORGE_SUCCESS_ICON = new IconAbsolute(RESOURCE, "forgeSuccess", 16, 16, 64f, 0f, 128f, 64f);
+    public final static IconAbsolute FORGE_FAIL_ICON = new IconAbsolute(RESOURCE, "forgeInvalid", 16, 16, 128f, 0f, 192f, 64f);
+    public final static IconAbsolute FORGE_UNKNOWN_ICON = new IconAbsolute(RESOURCE, "forgeUnknown", 16, 16, 192f, 0f, 256f, 64f);
 }

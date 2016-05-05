@@ -45,6 +45,6 @@ public abstract class MixinServerPingerStatusHandler implements INetHandlerStatu
     private void onHandleInfo(SPacketServerInfo packet, CallbackInfo ci) {
         IMixinServerStatusResponse response = (IMixinServerStatusResponse) packet.getResponse();
         IMixinServerData serverData = (IMixinServerData) this.val$server;
-        serverData.setServerType(response.getServerType());
+        serverData.setSpongeInfo(response.getSpongeInfo());
     }
 }

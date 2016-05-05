@@ -28,21 +28,21 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import net.minecraft.client.multiplayer.ServerData;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.client.ServerType;
+import org.spongepowered.client.SpongeStatusInfo;
 import org.spongepowered.client.interfaces.IMixinServerData;
 
 @Mixin(ServerData.class)
 public abstract class MixinServerData implements IMixinServerData {
 
-    private ServerType serverType = ServerType.VANILLA;
+    private SpongeStatusInfo statusInfo = SpongeStatusInfo.VANILLA;
 
     @Override
-    public void setServerType(ServerType serverType) {
-        this.serverType = checkNotNull(serverType, "serverType");
+    public void setSpongeInfo(SpongeStatusInfo statusInfo) {
+        this.statusInfo = checkNotNull(statusInfo, "statusInfo");
     }
 
     @Override
-    public ServerType getServerType() {
-        return this.serverType;
+    public SpongeStatusInfo getSpongeInfo() {
+        return this.statusInfo;
     }
 }

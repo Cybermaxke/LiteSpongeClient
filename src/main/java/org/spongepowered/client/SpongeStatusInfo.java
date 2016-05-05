@@ -22,13 +22,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.client.interfaces;
+package org.spongepowered.client;
 
-import org.spongepowered.client.SpongeStatusInfo;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-public interface IMixinServerStatusResponse {
+public final class SpongeStatusInfo {
 
-    void setSpongeInfo(SpongeStatusInfo statusInfo);
+    public static final SpongeStatusInfo VANILLA = new SpongeStatusInfo(ServerType.VANILLA, ServerCompatibility.SUCCESS);
 
-    SpongeStatusInfo getSpongeInfo();
+    private final ServerType serverType;
+    private final ServerCompatibility compatibility;
+
+    public SpongeStatusInfo(ServerType serverType, ServerCompatibility compatibility) {
+        this.compatibility = checkNotNull(compatibility, "compatibility");
+        this.serverType = checkNotNull(serverType, "serverType");
+    }
+
+    public ServerType getServerType() {
+        return this.serverType;
+    }
+
+    public ServerCompatibility getCompatibility() {
+        return this.compatibility;
+    }
 }
