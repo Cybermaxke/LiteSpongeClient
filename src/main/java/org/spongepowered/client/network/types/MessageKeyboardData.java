@@ -24,13 +24,11 @@
  */
 package org.spongepowered.client.network.types;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.text.ITextComponent;
 import org.spongepowered.client.keyboard.KeyBinding;
 import org.spongepowered.client.keyboard.KeyCategory;
 import org.spongepowered.client.network.Message;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.text.ITextComponent;
 
 import java.io.IOException;
 import java.util.Collection;

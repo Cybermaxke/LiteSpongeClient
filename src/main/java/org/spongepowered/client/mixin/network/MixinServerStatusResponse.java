@@ -24,33 +24,25 @@
  */
 package org.spongepowered.client.mixin.network;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import net.minecraft.network.ServerStatusResponse;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.client.ServerType;
 import org.spongepowered.client.interfaces.IMixinServerStatusResponse;
 
 @Mixin(ServerStatusResponse.class)
 public abstract class MixinServerStatusResponse implements IMixinServerStatusResponse {
 
-    private boolean sponge;
-    private boolean modded;
+    private ServerType serverType = ServerType.VANILLA;
 
     @Override
-    public boolean isSponge() {
-        return this.sponge;
+    public void setServerType(ServerType serverType) {
+        this.serverType = checkNotNull(serverType, "serverType");
     }
 
     @Override
-    public void setSponge(boolean sponge) {
-        this.sponge = sponge;
-    }
-
-    @Override
-    public boolean isModded() {
-        return this.modded;
-    }
-
-    @Override
-    public void setModded(boolean modded) {
-        this.modded = modded;
+    public ServerType getServerType() {
+        return this.serverType;
     }
 }

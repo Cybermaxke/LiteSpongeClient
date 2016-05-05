@@ -32,7 +32,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.client.ServerType;
 import org.spongepowered.client.interfaces.IMixinServerData;
 import org.spongepowered.client.interfaces.IMixinServerStatusResponse;
 
@@ -46,18 +45,6 @@ public abstract class MixinServerPingerStatusHandler implements INetHandlerStatu
     private void onHandleInfo(SPacketServerInfo packet, CallbackInfo ci) {
         IMixinServerStatusResponse response = (IMixinServerStatusResponse) packet.getResponse();
         IMixinServerData serverData = (IMixinServerData) this.val$server;
-
-        boolean modded = response.isModded();
-        boolean sponge = response.isSponge();
-
-        if (modded && sponge) {
-            serverData.setServerType(ServerType.SPONGE_MODDED);
-        } else if (sponge) {
-            serverData.setServerType(ServerType.SPONGE);
-        } else if (modded) {
-            serverData.setServerType(ServerType.MODDED);
-        } else {
-            serverData.setServerType(ServerType.VANILLA);
-        }
+        serverData.setServerType(response.getServerType());
     }
 }

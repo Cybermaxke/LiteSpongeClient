@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.client.textures;
+package org.spongepowered.client.gui;
 
 import com.mumfrey.liteloader.client.util.render.IconAbsolute;
 import net.minecraft.util.ResourceLocation;
@@ -31,4 +31,5 @@ public final class GuiIcons {
 
     public final static ResourceLocation RESOURCE = new ResourceLocation("litespongeclient:textures/gui/icons.png");
     public final static IconAbsolute SPONGE_ICON = new IconAbsolute(RESOURCE, "sponge", 16, 16, 0f, 0f, 64f, 64f);
+    public final static IconAbsolute FORGE_ICON = new IconAbsolute(RESOURCE, "forge", 16, 16, 64f, 0f, 128f, 64f);
 }

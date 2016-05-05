@@ -24,13 +24,11 @@
  */
 package org.spongepowered.client.interfaces;
 
+import org.spongepowered.client.ServerType;
+
 public interface IMixinServerStatusResponse {
 
-    boolean isSponge();
+    void setServerType(ServerType serverType);
 
-    void setSponge(boolean sponge);
-
-    boolean isModded();
-
-    void setModded(boolean modded);
+    ServerType getServerType();
 }

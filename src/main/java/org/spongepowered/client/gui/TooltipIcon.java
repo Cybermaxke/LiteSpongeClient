@@ -22,27 +22,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.client.mixin.client.multiplayer;
+package org.spongepowered.client.gui;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import net.minecraft.client.multiplayer.ServerData;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.client.ServerType;
-import org.spongepowered.client.interfaces.IMixinServerData;
+import com.mumfrey.liteloader.util.render.Icon;
 
-@Mixin(ServerData.class)
-public abstract class MixinServerData implements IMixinServerData {
+import javax.annotation.Nullable;
 
-    private ServerType serverType = ServerType.VANILLA;
+public final class TooltipIcon {
 
-    @Override
-    public void setServerType(ServerType serverType) {
-        this.serverType = checkNotNull(serverType, "serverType");
+    private final Icon icon;
+    @Nullable private final String tooltip;
+
+    public TooltipIcon(Icon icon, String tooltip) {
+        this.icon = checkNotNull(icon, "icon");
+        this.tooltip = tooltip;
     }
 
-    @Override
-    public ServerType getServerType() {
-        return this.serverType;
+    public Icon getIcon() {
+        return this.icon;
+    }
+
+    @Nullable
+    public String getTooltip() {
+        return this.tooltip;
     }
 }

@@ -31,13 +31,15 @@ public enum ServerType {
      */
     SPONGE,
     /**
-     * A modded sponge forge server.
+     * A modded sponge (forge) server, this mainly means that there are mods
+     * that also require a modded (forge) client to join.
      */
-    SPONGE_MODDED,
+    SPONGE_FORGE,
     /**
-     * A modded server.
+     * A modded (forge) server, this mainly means that there are mods
+     * that also require a modded (forge) client to join.
      */
-    MODDED,
+    FORGE,
     /**
      * A vanilla server.
      */

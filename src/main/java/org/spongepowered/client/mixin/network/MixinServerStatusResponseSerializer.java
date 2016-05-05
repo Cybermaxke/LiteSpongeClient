@@ -32,10 +32,10 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.client.ServerType;
 import org.spongepowered.client.interfaces.IMixinServerStatusResponse;
 
 import java.lang.reflect.Type;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -49,7 +49,7 @@ public abstract class MixinServerStatusResponseSerializer {
         JsonObject modInfo = json.has("modinfo") ? json.getAsJsonObject("modinfo") : null;
 
         ServerStatusResponse response = cir.getReturnValue();
-        List<String> mods = Collections.emptyList();
+        List<String> mods = null;
 
         if (modInfo != null && modInfo.has("modList")) {
             mods = StreamSupport.stream(json.getAsJsonArray("modList").spliterator(), false)
@@ -57,18 +57,19 @@ public abstract class MixinServerStatusResponseSerializer {
                     .collect(Collectors.toList());
         }
 
-        if (json.has("sponge")) {
-            ((IMixinServerStatusResponse) response).setSponge(json.get("sponge").getAsBoolean());
-        } else if (!mods.isEmpty()) {
-            ((IMixinServerStatusResponse) response).setSponge(mods.contains("SpongeForge"));
+        ServerType serverType = json.has("spongeServerType") ? ServerType.valueOf(json.get("spongeServerType").getAsString().toUpperCase()) : null;
+        if (serverType == null) {
+            if (mods != null) {
+                boolean sponge = mods.contains("SpongeForge");
+                if (sponge) {
+                    serverType = ServerType.SPONGE_FORGE;
+                } else {
+                    serverType = ServerType.FORGE;
+                }
+            }
         }
-
-        if (json.has("modded")) {
-            ((IMixinServerStatusResponse) response).setModded(json.get("modded").getAsBoolean());
-        } else {
-            mods.remove("FML");
-            mods.remove("SpongeForge");
-            ((IMixinServerStatusResponse) response).setModded(mods.size() > 0);
+        if (serverType != null) {
+            ((IMixinServerStatusResponse) response).setServerType(serverType);
         }
     }
 }

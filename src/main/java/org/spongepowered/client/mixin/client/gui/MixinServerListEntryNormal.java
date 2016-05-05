@@ -25,9 +25,9 @@
 package org.spongepowered.client.mixin.client.gui;
 
 import com.mumfrey.liteloader.client.gui.SpongeClientGuiHelper;
-import com.mumfrey.liteloader.util.render.Icon;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiListExtended;
+import net.minecraft.client.gui.GuiMultiplayer;
 import net.minecraft.client.gui.ServerListEntryNormal;
 import net.minecraft.client.multiplayer.ServerData;
 import org.spongepowered.asm.mixin.Final;
@@ -36,14 +36,17 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.client.ServerType;
+import org.spongepowered.client.gui.GuiIcons;
+import org.spongepowered.client.gui.TooltipIcon;
 import org.spongepowered.client.interfaces.IMixinServerData;
-import org.spongepowered.client.textures.GuiIcons;
 
 @Mixin(ServerListEntryNormal.class)
 public abstract class MixinServerListEntryNormal implements GuiListExtended.IGuiListEntry {
 
     @Final @Shadow private Minecraft mc;
     @Final @Shadow private ServerData server;
+    @Final @Shadow private GuiMultiplayer owner;
 
     @Inject(method = "drawEntry", at = @At(value = "INVOKE", shift = At.Shift.AFTER,
             target = "Lnet/minecraft/client/gui/ServerListEntryNormal;drawTextureAt(IILnet/minecraft/util/ResourceLocation;)V"))
@@ -51,25 +54,31 @@ public abstract class MixinServerListEntryNormal implements GuiListExtended.IGui
         int rx = mouseX - x;
         int ry = mouseY - y;
 
-        this.mc.getTextureManager().bindTexture(GuiIcons.RESOURCE);
+        TooltipIcon[] icons = null;
+        ServerType serverType = ((IMixinServerData) this.server).getServerType();
 
-        Icon icon = null;
-        switch (((IMixinServerData) this.server).getServerType()) {
-            case SPONGE_MODDED:
-                // TODO
-            case SPONGE:
-                icon = GuiIcons.SPONGE_ICON;
-                break;
-            case MODDED:
-                // TODO
-                break;
+        if (serverType != ServerType.VANILLA) {
+            icons = new TooltipIcon[serverType == ServerType.SPONGE_FORGE ? 2 : 1];
+            int index = 0;
+            if (serverType == ServerType.SPONGE_FORGE || serverType == ServerType.SPONGE) {
+                icons[index++] = new TooltipIcon(GuiIcons.SPONGE_ICON, "Sponge Server");
+            }
+            if (serverType == ServerType.SPONGE_FORGE || serverType == ServerType.FORGE) {
+                icons[index] = new TooltipIcon(GuiIcons.FORGE_ICON, "Forge Server");
+            }
         }
 
-        if (icon != null) {
-            SpongeClientGuiHelper.glDrawTexturedRect(x + width - 20, y + 13, icon, 1f);
+        if (icons != null) {
+            this.mc.getTextureManager().bindTexture(GuiIcons.RESOURCE);
+            int xOffset = 0;
 
-            if (rx > width - 15 && rx < width && ry > 10 && ry < 26) {
-                // Tooltip
+            for (TooltipIcon icon : icons) {
+                SpongeClientGuiHelper.glDrawTexturedRect(x + width - 22 - xOffset, y + 13, icon.getIcon(), 1f);
+                String tooltip = icon.getTooltip();
+                if (tooltip != null && rx > width - 23 - xOffset && rx < width - 2 - xOffset && ry > 12 && ry < 30) {
+                    this.owner.setHoveringText(tooltip);
+                }
+                xOffset += 20;
             }
         }
     }
