@@ -24,16 +24,11 @@
  */
 package org.spongepowered.client;
 
-import com.mojang.realmsclient.dto.RealmsServer;
-import com.mumfrey.liteloader.JoinGameListener;
 import com.mumfrey.liteloader.LiteMod;
 import com.mumfrey.liteloader.PluginChannelListener;
 import com.mumfrey.liteloader.ShutdownListener;
 import com.mumfrey.liteloader.core.LiteLoader;
-import net.minecraft.client.multiplayer.ServerData;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.play.server.SPacketJoinGame;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.client.interfaces.IMixinNetHandlerPlayClient;
@@ -53,7 +48,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-public class LiteModSpongeClient implements LiteMod, ShutdownListener, PluginChannelListener, JoinGameListener {
+public class LiteModSpongeClient implements LiteMod, ShutdownListener, PluginChannelListener {
 
     public static final String CHANNEL_NAME = "Sponge";
     public static final int PROTOCOL_VERSION = 0;
@@ -174,10 +169,5 @@ public class LiteModSpongeClient implements LiteMod, ShutdownListener, PluginCha
             return this.channelHandler.getChannels();
         }
         return Collections.emptyList();
-    }
-
-    @Override
-    public void onJoinGame(INetHandler netHandler, SPacketJoinGame joinGamePacket, ServerData serverData, RealmsServer realmsServer) {
-        this.channelHandler.sendToServer(new MessageProtocolVersion(PROTOCOL_VERSION));
     }
 }
