@@ -24,19 +24,26 @@
  */
 package org.spongepowered.client;
 
+import com.mojang.realmsclient.dto.RealmsServer;
+import com.mumfrey.liteloader.JoinGameListener;
 import com.mumfrey.liteloader.LiteMod;
 import com.mumfrey.liteloader.PluginChannelListener;
 import com.mumfrey.liteloader.ShutdownListener;
 import com.mumfrey.liteloader.core.LiteLoader;
+import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.network.INetHandler;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.play.server.SPacketJoinGame;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.spongepowered.client.interfaces.IMixinNetHandlerPlayClient;
 import org.spongepowered.client.keyboard.KeyBindingStorage;
 import org.spongepowered.client.keyboard.KeyboardNetworkHandler;
 import org.spongepowered.client.network.MessageChannelHandler;
 import org.spongepowered.client.network.MessageRegistry;
 import org.spongepowered.client.network.types.MessageKeyState;
 import org.spongepowered.client.network.types.MessageKeyboardData;
+import org.spongepowered.client.network.types.MessageProtocolVersion;
 import org.spongepowered.client.network.types.MessageTrackerDataRequest;
 import org.spongepowered.client.network.types.MessageTrackerDataResponse;
 import org.spongepowered.client.tracker.TrackerDataResponseHandler;
@@ -46,9 +53,10 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-public class LiteModSpongeClient implements LiteMod, ShutdownListener, PluginChannelListener {
+public class LiteModSpongeClient implements LiteMod, ShutdownListener, PluginChannelListener, JoinGameListener {
 
     public static final String CHANNEL_NAME = "Sponge";
+    public static final int PROTOCOL_VERSION = 0;
 
     private static LiteModSpongeClient instance;
 
@@ -91,6 +99,8 @@ public class LiteModSpongeClient implements LiteMod, ShutdownListener, PluginCha
 
         // Register all the network messages
         MessageRegistry messageRegistry = new MessageRegistry();
+        messageRegistry.register(-1, MessageProtocolVersion.class, (handler, message) ->
+                ((IMixinNetHandlerPlayClient) handler).setSpongeProtocolVersion(message.getProtocolVersion()));
         messageRegistry.register(0, MessageTrackerDataRequest.class);
         messageRegistry.register(1, MessageTrackerDataResponse.class, TrackerDataResponseHandler::handleTrackerResponse);
         messageRegistry.register(2, MessageKeyboardData.class, KeyboardNetworkHandler::handleKeyboardData);
@@ -164,5 +174,10 @@ public class LiteModSpongeClient implements LiteMod, ShutdownListener, PluginCha
             return this.channelHandler.getChannels();
         }
         return Collections.emptyList();
+    }
+
+    @Override
+    public void onJoinGame(INetHandler netHandler, SPacketJoinGame joinGamePacket, ServerData serverData, RealmsServer realmsServer) {
+        this.channelHandler.sendToServer(new MessageProtocolVersion(PROTOCOL_VERSION));
     }
 }

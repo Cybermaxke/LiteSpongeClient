@@ -10,9 +10,11 @@
         "client.gui.MixinGuiOverlayDebug",
         "client.gui.MixinServerListEntryNormal",
         "client.multiplayer.MixinServerData",
+        "client.network.MixinNetHandlerPlayClient",
         "client.network.MixinNetworkManager",
         "client.network.MixinServerPingerStatusHandler",
         "client.settings.MixinKeyBinding",
+        "liteloader.client.MixinClientPluginChannelsClient",
         "network.MixinServerStatusResponse",
         "network.MixinServerStatusResponseSerializer"
     ],
