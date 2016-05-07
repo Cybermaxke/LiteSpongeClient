@@ -118,13 +118,14 @@ public class MessageRegistry {
     private <M extends Message> void register0(int opcode, Class<M> messageType, @Nullable MessageHandler<? super M> handler) {
         checkNotNull(messageType, "messageType");
         checkArgument(!this.registrationByType.containsValue(messageType), "The message type is already registered");
-        checkArgument(!this.registrationByOpcode.containsItem(opcode), "The opcode is already used");
+        byte opcode0 = (byte) opcode;
+        checkArgument(!this.registrationByOpcode.containsItem(opcode0), "The opcode is already used");
         Optional<MessageHandler<? super M>> handlerRegistration = Optional.empty();
         if (handler != null) {
             handlerRegistration = Optional.of(handler);
         }
-        MessageRegistration<M> registration = new MessageRegistrationImpl<>((byte) opcode, messageType, handlerRegistration);
-        this.registrationByOpcode.addKey(opcode, registration);
+        MessageRegistration<M> registration = new MessageRegistrationImpl<>(opcode0, messageType, handlerRegistration);
+        this.registrationByOpcode.addKey(opcode0, registration);
         this.registrationByType.put(messageType, registration);
     }
 }

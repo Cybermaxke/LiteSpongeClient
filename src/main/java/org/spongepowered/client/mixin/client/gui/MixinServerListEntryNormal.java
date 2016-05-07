@@ -71,7 +71,7 @@ public abstract class MixinServerListEntryNormal implements GuiListExtended.IGui
                 if (compat == ServerCompatibility.SUCCESS) {
                     icons[index] = new TooltipIcon(GuiIcons.FORGE_SUCCESS_ICON, "Forge Server");
                 } else if (compat == ServerCompatibility.FAIL) {
-                    icons[index] = new TooltipIcon(GuiIcons.FORGE_FAIL_ICON, "Forge Server\n? Incompatible");
+                    icons[index] = new TooltipIcon(GuiIcons.FORGE_FAIL_ICON, "Forge Server\n\u27A1 Incompatible");
                 } else {
                     icons[index] = new TooltipIcon(GuiIcons.FORGE_UNKNOWN_ICON, "Forge Server\n\u27A1 Unknown compatibility");
                 }

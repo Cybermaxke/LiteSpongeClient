@@ -117,7 +117,6 @@ public class MessageChannelHandler implements MessageDispatcher {
         } else {
             this.logger.warn("Attempted to send a message type {} that wasn't registered", registration.get().getType().getName());
         }
-
     }
 
 }

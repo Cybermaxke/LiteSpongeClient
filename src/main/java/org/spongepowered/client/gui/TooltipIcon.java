@@ -35,7 +35,7 @@ public final class TooltipIcon {
     private final Icon icon;
     @Nullable private final String tooltip;
 
-    public TooltipIcon(Icon icon, String tooltip) {
+    public TooltipIcon(Icon icon, @Nullable String tooltip) {
         this.icon = checkNotNull(icon, "icon");
         this.tooltip = tooltip;
     }
