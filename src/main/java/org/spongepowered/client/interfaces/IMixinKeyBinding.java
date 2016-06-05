@@ -32,8 +32,6 @@ public interface IMixinKeyBinding extends IClientKeyBinding {
 
     void setPressed(boolean pressed);
 
-    void setPressTime(int time);
-
     /**
      * Removed this key binding from the internal array.
      */

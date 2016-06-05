@@ -80,7 +80,7 @@ public class KeyboardNetworkHandler {
         List<net.minecraft.client.settings.KeyBinding> keyBindings = new ArrayList<>(Arrays.asList(gameSettings.keyBindings));
         for (KeyBinding keyBinding : message.getKeyBindings()) {
             CustomClientKeyBinding clientKeyBinding = new CustomClientKeyBinding(keyBinding);
-            storage.getKeyCode(keyBinding.getId().toLowerCase()).ifPresent(clientKeyBinding::setKeyCodeWithoutSave);
+            storage.get(keyBinding.getId().toLowerCase()).ifPresent(clientKeyBinding::setKeyCodeWithoutSave);
             keyBindings.add(clientKeyBinding);
         }
         // Update the key bindings array in the settings menu
@@ -101,7 +101,7 @@ public class KeyboardNetworkHandler {
             net.minecraft.client.settings.KeyBinding keyBinding = it.next();
             if (keyBinding instanceof CustomClientKeyBinding) {
                 ((IMixinKeyBinding) keyBinding).remove();
-                storage.putKeyCode(((CustomClientKeyBinding) keyBinding).getId(), keyBinding.getKeyCode());
+                storage.put(((CustomClientKeyBinding) keyBinding).getId(), keyBinding.getKeyCode());
                 it.remove();
             } else {
                 ((IMixinKeyBinding) keyBinding).setInternalId(-1);

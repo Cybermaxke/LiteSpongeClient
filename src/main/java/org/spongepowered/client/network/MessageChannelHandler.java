@@ -86,7 +86,7 @@ public class MessageChannelHandler implements MessageDispatcher {
                     return;
                 }
 
-                NetHandlerPlayClient netHandler = Minecraft.getMinecraft().thePlayer.sendQueue;
+                NetHandlerPlayClient netHandler = Minecraft.getMinecraft().thePlayer.connection;
                 handler.handle(netHandler, message);
             }
         } else {
@@ -113,7 +113,7 @@ public class MessageChannelHandler implements MessageDispatcher {
             buf.writeBytes(content);
 
             CPacketCustomPayload packet = new CPacketCustomPayload(this.channel, buf);
-            Minecraft.getMinecraft().thePlayer.sendQueue.addToSendQueue(packet);
+            Minecraft.getMinecraft().thePlayer.connection.sendPacket(packet);
         } else {
             this.logger.warn("Attempted to send a message type {} that wasn't registered", registration.get().getType().getName());
         }

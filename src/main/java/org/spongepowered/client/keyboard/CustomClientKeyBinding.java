@@ -67,7 +67,7 @@ public class CustomClientKeyBinding extends net.minecraft.client.settings.KeyBin
         super.setKeyCode(keyCode);
         if (oldKeyCode != keyCode) {
             KeyBindingStorage storage = LiteModSpongeClient.getInstance().getKeyBindingStorage();
-            storage.putKeyCode(this.id, keyCode);
+            storage.put(this.id, keyCode);
             try {
                 storage.save();
             } catch (IOException e) {

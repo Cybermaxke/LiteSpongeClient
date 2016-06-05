@@ -37,8 +37,8 @@ sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
 minecraft {
-    version = '1.9'
-    mappings = 'snapshot_20160410'
+    version = '1.9.4'
+    mappings = 'snapshot_20160522'
     runDir = 'run'
 }
 

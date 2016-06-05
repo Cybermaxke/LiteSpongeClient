@@ -100,7 +100,7 @@ public class LiteModSpongeClient implements LiteMod, ShutdownListener, PluginCha
         this.channelHandler = new MessageChannelHandler(messageRegistry, CHANNEL_NAME, this.logger);
 
         // Initialize the key binding storage
-        this.keyBindingStorage = new KeyBindingStorage(new File("").toPath().resolve("sponge-key-bindings.txt"));
+        this.keyBindingStorage = new KeyBindingStorage(new File("").toPath().resolve("sponge-key-bindings.properties"));
         try {
             this.keyBindingStorage.load();
         } catch (IOException e) {

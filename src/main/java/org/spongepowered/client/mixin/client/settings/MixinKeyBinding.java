@@ -45,12 +45,13 @@ import java.util.stream.Collectors;
 @Mixin(KeyBinding.class)
 public abstract class MixinKeyBinding implements IMixinKeyBinding, Comparable<KeyBinding> {
 
+    @Shadow public abstract String getKeyDescription();
+    @Shadow public abstract String getKeyCategory();
+
     @Final @Shadow private static List<KeyBinding> KEYBIND_ARRAY;
     @Final @Shadow private static IntHashMap<KeyBinding> HASH;
     @Shadow private boolean pressed;
     @Shadow private int pressTime;
-    @Final @Shadow private String keyCategory;
-    @Final @Shadow private String keyDescription;
 
     private int internalId = -1;
 
@@ -72,23 +73,24 @@ public abstract class MixinKeyBinding implements IMixinKeyBinding, Comparable<Ke
     }
 
     @Override
-    public void setPressTime(int time) {
-        this.pressTime = time;
-    }
-
-    @Override
     public void remove() { // SpongeForge
         KEYBIND_ARRAY.remove(this);
     }
 
     @Override
     public String getFormattedCategory() {
-        return I18n.format(this.keyCategory);
+        return I18n.format(this.getKeyCategory());
     }
 
     @Override
     public String getFormattedDisplayName() {
-        return I18n.format(this.keyDescription);
+        return I18n.format(this.getKeyDescription());
+    }
+
+    @Overwrite
+    private void unpressKey() {
+        this.setPressed(false);
+        this.pressTime = 0;
     }
 
     /**
@@ -123,20 +125,6 @@ public abstract class MixinKeyBinding implements IMixinKeyBinding, Comparable<Ke
             if (keyBinding != null) {
                 keyBinding.setPressed(pressed);
             }
-        }
-    }
-
-    /**
-     * @author Cybermaxke
-     * @reason Overwritten to delegate the pressed state change through a method,
-     * which allows us to track the change and send network messages.
-     */
-    @Overwrite
-    public static void unPressAllKeys() {
-        for (KeyBinding keyBinding : KEYBIND_ARRAY) {
-            IMixinKeyBinding keyBinding0 = (IMixinKeyBinding) keyBinding;
-            keyBinding0.setPressed(false);
-            keyBinding0.setPressTime(0);
         }
     }
 
