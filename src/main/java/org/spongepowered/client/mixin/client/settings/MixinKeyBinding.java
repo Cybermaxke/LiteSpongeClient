@@ -45,8 +45,8 @@ import java.util.stream.Collectors;
 @Mixin(KeyBinding.class)
 public abstract class MixinKeyBinding implements IMixinKeyBinding, Comparable<KeyBinding> {
 
-    @Shadow public abstract String getKeyDescription();
-    @Shadow public abstract String getKeyCategory();
+    @Shadow public abstract String shadow$getKeyDescription();
+    @Shadow public abstract String shadow$getKeyCategory();
 
     @Final @Shadow private static List<KeyBinding> KEYBIND_ARRAY;
     @Final @Shadow private static IntHashMap<KeyBinding> HASH;
@@ -79,12 +79,12 @@ public abstract class MixinKeyBinding implements IMixinKeyBinding, Comparable<Ke
 
     @Override
     public String getFormattedCategory() {
-        return I18n.format(this.getKeyCategory());
+        return I18n.format(this.shadow$getKeyCategory());
     }
 
     @Override
     public String getFormattedDisplayName() {
-        return I18n.format(this.getKeyDescription());
+        return I18n.format(this.shadow$getKeyDescription());
     }
 
     @Overwrite
